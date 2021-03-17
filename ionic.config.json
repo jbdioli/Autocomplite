@@ -1,0 +1,7 @@
+{
+  "name": "Autocomplite",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
