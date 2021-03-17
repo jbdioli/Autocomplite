@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>ionic autocomplete</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-input (ionInput)="onInput($event)" type="text"></ion-input>
+  <ion-list [hidden]="items.length < 0">
+    <ion-item (click)="onSelected(item)" *ngFor="let item of items">
+      <ion-label>{{item.country}}</ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
