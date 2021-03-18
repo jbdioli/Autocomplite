@@ -6,11 +6,30 @@
 
 <ion-content>
 
-  <ion-input (ionInput)="onInput($event)" type="text"></ion-input>
-  <ion-list [hidden]="items.length < 0">
-    <ion-item (click)="onSelected(item)" *ngFor="let item of items">
-      <ion-label>{{item.country}}</ion-label>
-    </ion-item>
-  </ion-list>
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <h1>Select your place</h1>
+    <h2>Choose your contry</h2>
+    <ion-input (ionInput)="onInputCountry($event)" type="text" formControlName="country"></ion-input>
+    <div class="div_autocomplite" [hidden]="countriesItems.length <= 0">
+      <ion-list lines="none">
+        <ion-item class="item_autocomplite" (click)="onSelectedCountry(country, form)" *ngFor="let country of countriesItems">
+          <ion-label>{{country.country}}</ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+    <h2>Select your cities</h2>
+    <ion-textarea class="div_cities" (ionInput)="onInputCities($event)" type="text" formControlName="cities"></ion-textarea>
+    <div class="div_autocomplite" [hidden]="citiesItems.length <= 0">
+      <ion-list lines="none">
+        <ion-item class="item_autocomplite" (click)="onSelectedCities(city, form, idx)" *ngFor="let city of citiesItems, let idx=index">
+          <ion-label>{{city.city}}</ion-label>
+          <ion-checkbox slot="start" [(ngModel)]="city.isChecked" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </div>
+
+
+    <ion-button expand="full" fill="outline" type="submit" [disabled]="form.invalid">Validated</ion-button>
+  </form>
 
 </ion-content>
