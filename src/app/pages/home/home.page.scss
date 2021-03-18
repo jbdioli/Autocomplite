@@ -26,7 +26,10 @@ ion-input {
 
 .item_autocomplite {
   --color: #83b7c0;
-  --color-hover: #223033;
+}
+
+.item_autocomplite.item:hover {
+  --ion-background-color: #398697; // don't works well
 }
 
 ion-textarea {

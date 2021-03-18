@@ -74,45 +74,59 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onInputCities(ev: any) {
-    const value: string = ev.target.value;
-    const oldPosition = this.position;
-    // console.log('value', value);
+    const city: string = ev.target.value;
 
-
-    this.position = value.lastIndexOf(',');
+    this.position = city.lastIndexOf(',');
     if (this.position > -1) {
-      let newValue: string;
-      const c: string = value.slice(this.position + 1, this.position + 2);
+      let newCity: string;
+      const c: string = city.slice(this.position + 1, this.position + 2);
       if (c.includes(' ')) {
-        newValue = value.slice(this.position + 2);
+        newCity = city.slice(this.position + 2);
       } else {
-        newValue = value.slice(this.position + 1);
+        newCity = city.slice(this.position + 1);
       }
 
       // console.log('newValue', newValue);
       // console.log('Position', this.position);
 
-      this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(newValue.toLocaleLowerCase()));
+      this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(newCity.toLocaleLowerCase()));
+      if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(newCity)) {
+        this.citiesItems[0].isChecked = true;
+      }
       console.log('Cities Items', this.citiesItems);
+      return;
     }
 
-    if (value.length <= 0) {
+    if (city.length <= 0) {
       this.citiesItems = [];
       return;
     }
 
-    const buffer = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(value.toLocaleLowerCase()));
-    this.citiesItems = buffer;
+    this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(city.toLocaleLowerCase()));
+    if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(city)) {
+      this.citiesItems[0].isChecked = true;
+    }
   }
 
   onSelectedCities(item: CityModel, form: FormGroup, index: number) {
-    const buffer = form.value.cities + ', ' + item.city;
+
 
     form.patchValue({cities: item.city});
     this.citiesSaved.push({city: item.city, id: item.id, isChecked: item.isChecked});
     this.citiesItems = [];
   }
 
+  onClosingAutocomplete() {
+    if ( this.countriesItems.length > 0) {
+      this.countriesItems = [];
+      return;
+    }
+
+    if ( this.citiesItems.length > 0) {
+      this.citiesItems = [];
+      return;
+    }
+  }
 
   onSave() {
     console.log('Form : ', this.form.value);
