@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { from, Subscription } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { CityModel } from 'src/app/models/city.model';
 import { CountryModel } from 'src/app/models/country.model';
 import { CoreStorageService } from 'src/app/services/core-storage.service';
@@ -93,7 +93,7 @@ export class HomePage implements OnInit, OnDestroy {
       if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(newCity)) {
         this.citiesItems[0].isChecked = true;
       }
-      console.log('Cities Items', this.citiesItems);
+      // console.log('Cities Items', this.citiesItems);
       return;
     }
 
