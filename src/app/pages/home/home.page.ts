@@ -5,6 +5,11 @@ import { CityModel } from 'src/app/models/city.model';
 import { CountryModel } from 'src/app/models/country.model';
 import { CoreStorageService } from 'src/app/services/core-storage.service';
 
+interface ICity {
+  city: string;
+  isNew: boolean;
+}
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -14,9 +19,7 @@ export class HomePage implements OnInit, OnDestroy {
   countrySub: Subscription;
   citySub: Subscription;
 
-
   form: FormGroup;
-
 
   countriesItems: CountryModel[] = [];
   citiesItems: CityModel[] = [];
@@ -25,8 +28,6 @@ export class HomePage implements OnInit, OnDestroy {
   citiesSaved: CityModel[] = [];
 
   isCityChecked: boolean;
-
-  position = 0;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -74,44 +75,34 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onInputCities(ev: any) {
-    const city: string = ev.target.value;
+    let city: ICity;
+    const cities: string = ev.target.value;
 
-    this.position = city.lastIndexOf(',');
-    if (this.position > -1) {
-      let newCity: string;
-      const c: string = city.slice(this.position + 1, this.position + 2);
-      if (c.includes(' ')) {
-        newCity = city.slice(this.position + 2);
-      } else {
-        newCity = city.slice(this.position + 1);
-      }
-
-      // console.log('newValue', newValue);
-      // console.log('Position', this.position);
-
-      this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(newCity.toLocaleLowerCase()));
-      if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(newCity)) {
-        this.citiesItems[0].isChecked = true;
-      }
-      // console.log('Cities Items', this.citiesItems);
-      return;
-    }
-
-    if (city.length <= 0) {
+    if (cities.length <= 0) {       // Undisplay selection box
       this.citiesItems = [];
       return;
     }
 
-    this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(city.toLocaleLowerCase()));
-    if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(city)) {
-      this.citiesItems[0].isChecked = true;
+    city = this.findLastCity(cities);
+
+    if (!city.isNew) {
+      this.setIsChecked(city.city);
+      return;
     }
+    this.setIsChecked(cities);
   }
 
   onSelectedCities(item: CityModel, form: FormGroup, index: number) {
+    const buffer: string = form.value.cities;
 
+    const position = buffer.lastIndexOf(',');
 
-    form.patchValue({cities: item.city});
+    let cities: string;
+    if (item.city.length > 0) {
+      cities = buffer + ', ' + item.city;
+    }
+
+    form.patchValue({cities});
     this.citiesSaved.push({city: item.city, id: item.id, isChecked: item.isChecked});
     this.citiesItems = [];
   }
@@ -125,6 +116,32 @@ export class HomePage implements OnInit, OnDestroy {
     if ( this.citiesItems.length > 0) {
       this.citiesItems = [];
       return;
+    }
+  }
+
+
+  findLastCity(cities: string): ICity {
+    const city: ICity = {city: '', isNew: false};
+
+    const position = cities.lastIndexOf(',');
+    if (position > -1) {
+      const c: string = cities.slice(position + 1, position + 2);
+      if (c.includes(' ')) {
+        city.city = cities.slice(position + 2);
+      } else {
+        city.city = cities.slice(position + 1);
+      }
+    } else if (position === -1) {
+      city.city = cities;
+      city.isNew = true;
+    }
+    return city;
+  }
+
+  setIsChecked(city: string) {
+    this.citiesItems = this.cities.filter(elmnt => elmnt.city.toLocaleLowerCase().includes(city.toLocaleLowerCase()));
+    if (this.citiesItems.length === 1 && this.citiesItems[0].city.includes(city)) {
+      this.citiesItems[0].isChecked = true;
     }
   }
 
