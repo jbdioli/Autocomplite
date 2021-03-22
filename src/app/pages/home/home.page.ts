@@ -98,7 +98,7 @@ export class HomePage implements OnInit, OnDestroy {
     const position = buffer.lastIndexOf(',');
 
     let cities: string;
-    if (item.city.length > 0) {
+    if (item.city.length > 0 ) {
       cities = buffer + ', ' + item.city;
     }
 
