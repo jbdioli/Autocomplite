@@ -5,7 +5,7 @@ import { CityModel } from 'src/app/models/city.model';
 import { CountryModel } from 'src/app/models/country.model';
 import { CoreStorageService } from 'src/app/services/core-storage.service';
 
-interface ICity {
+interface ICityModel {
   city: string;
   isNew: boolean;
 }
@@ -75,7 +75,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onInputCities(ev: any) {
-    let city: ICity;
+    let city: ICityModel;
     const cities: string = ev.target.value;
 
     if (cities.length <= 0) {       // Undisplay selection box
@@ -93,13 +93,22 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onSelectedCities(item: CityModel, form: FormGroup, index: number) {
-    const buffer: string = form.value.cities;
+    let lastCity: ICityModel;
+    let buffer: string = form.value.cities;
 
-    const position = buffer.lastIndexOf(',');
+    lastCity = this.findLastCity(buffer);
+
+    const lastChat = buffer.slice(buffer.length - 1);
 
     let cities: string;
-    if (item.city.length > 0 ) {
-      cities = buffer + ', ' + item.city;
+    if (item.city.length > 0 && lastChat !== ',') {
+      if (!lastCity.isNew) {
+        // buffer = buffer.slice((buffer.length - lastCity.city.length) - 1); // keep the last part of the string
+        buffer = buffer.slice(0, (buffer.length - lastCity.city.length) - 1);
+        cities = buffer + ' ' + item.city;
+      } else {
+        cities = item.city;
+      }
     }
 
     form.patchValue({cities});
@@ -120,8 +129,8 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
 
-  findLastCity(cities: string): ICity {
-    const city: ICity = {city: '', isNew: false};
+  findLastCity(cities: string): ICityModel {
+    const city: ICityModel = {city: '', isNew: false};
 
     const position = cities.lastIndexOf(',');
     if (position > -1) {
