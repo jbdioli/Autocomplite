@@ -86,11 +86,14 @@ export class HomePage implements OnInit, OnDestroy {
 
     const writingCity: ICityModel = this.findLastWriting(cities);
 
-    this.setIsChecked(cities);
+    this.setIsChecked(cities, writingCity.isFirstCity);
 
     this.citiesItems = this.citiesRef.filter(
       elmnt => elmnt.city.toLocaleLowerCase().includes(writingCity.city.toLocaleLowerCase())
     );
+
+    // this.unSetIsChecked(cities, writingCity.isFirstCity);
+    console.log('ref ', this.citiesRef);
     // this.form.patchValue({cities: this.citiesItems[0].city});
     // console.log('object form : ', this.form.value);
   }
@@ -170,36 +173,86 @@ export class HomePage implements OnInit, OnDestroy {
     return id;
   }
 
-  setIsChecked(cities: string) {
-    let city = '';
-    const position = cities.lastIndexOf(',');
 
-    if (position > -1) {
-      const buffer: string = cities.slice(0, position);
-      const positionBefore = buffer.lastIndexOf(',');
-      if (positionBefore > -1) {
-        const c: string = buffer.slice(positionBefore + 1, positionBefore + 2);
-        if (c.includes(' ')) {
-          city = buffer.slice(positionBefore + 2, position);
-        } else {
-          city = buffer.slice(positionBefore + 1, position);
+  setIsChecked(cities: string, isFirstCity: boolean) {
+    let citiesList: string[];
+
+    if (isFirstCity) {
+      citiesList  = cities.split(',');
+    } else {
+      citiesList = cities.split(', ');
+    }
+
+    this.citiesRef.forEach((elmnt) => {
+      if (elmnt.isChecked) {
+        if (!citiesList.includes(elmnt.city)) {
+          elmnt.isChecked = false;
         }
       } else {
-        city = buffer;
+        if (citiesList.includes(elmnt.city)) {
+          elmnt.isChecked = true;
+        }
       }
-    } else {
-      city = cities;
-    }
 
-    const citiesFound = this.citiesRef.find(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
-    if (citiesFound !== undefined) {
-      citiesFound.isChecked = true;
-    }
+    });
 
   }
 
-  onSave() {
+  // setIsChecked(cities: string) {
+  //   let city = '';
+  //   const position = cities.lastIndexOf(',');
 
+  //   if (position > -1) {
+  //     const buffer: string = cities.slice(0, position);
+  //     const positionBefore = buffer.lastIndexOf(',');
+  //     if (positionBefore > -1) {
+  //       const c: string = buffer.slice(positionBefore + 1, positionBefore + 2);
+  //       if (c.includes(' ')) {
+  //         city = buffer.slice(positionBefore + 2, position);
+  //       } else {
+  //         city = buffer.slice(positionBefore + 1, position);
+  //       }
+  //     } else {
+  //       city = buffer;
+  //     }
+  //   } else {
+  //     city = cities;
+  //   }
+
+  //   const citiesFound = this.citiesRef.find(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
+  //   if (citiesFound !== undefined) {
+  //     citiesFound.isChecked = true;
+  //   }
+
+  // }
+
+  unSetIsChecked(cities: string, isFirstCity: boolean) {
+
+    let citiesList: string[];
+
+    if (isFirstCity) {
+      citiesList  = cities.split(',');
+    } else {
+      citiesList = cities.split(', ');
+    }
+
+    // console.log('list ', citiesList);
+
+    this.citiesRef.forEach((elmnt) => {
+      let isCityFound = false;
+      if (elmnt.isChecked) {
+        console.log('element ', elmnt.city);
+        console.log('list ', citiesList);
+        isCityFound = citiesList.includes(elmnt.city);
+        console.log('isCityFound ', isCityFound);
+      }
+      if (!isCityFound && elmnt.isChecked) {
+        elmnt.isChecked = false;
+      }
+    });
+  }
+
+  onSave() {
     console.log('Form : ', this.form.value);
     console.log('citiesSaved object', this.citiesSaved);
   }
