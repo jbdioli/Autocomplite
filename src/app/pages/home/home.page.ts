@@ -71,7 +71,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onSelectedCountry(item: CountryModel, form: FormGroup) {
-    form.patchValue({country: item.country, idCountries: item.id});
+    form.patchValue({ country: item.country, idCountries: item.id });
     this.countriesItems = [];
   }
 
@@ -85,22 +85,14 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     const writingCity: ICityModel = this.findLastWriting(cities);
-    console.log('Wrinting ', writingCity);
 
-    console.log('cities items ', this.citiesItems);
-    console.log('object form : ', this.form.value);
+    this.setIsChecked(cities);
 
-    if (!writingCity.isFirstCity) {
-      this.citiesItems = this.setIsChecked(this.form);
-      // this.form.patchValue({cities: this.citiesItems[0].city});
-      // console.log('object form : ', this.form.value);
-      return;
-    }
-
-    this.citiesItems = this.setIsChecked(this.form);
-    if (this.citiesItems.length === 1) {
-      // this.form.patchValue({cities: this.citiesItems[0].city});
-    }
+    this.citiesItems = this.citiesRef.filter(
+      elmnt => elmnt.city.toLocaleLowerCase().includes(writingCity.city.toLocaleLowerCase())
+    );
+    // this.form.patchValue({cities: this.citiesItems[0].city});
+    // console.log('object form : ', this.form.value);
   }
 
   onSelectedCities(item: CityModel, form: FormGroup, index: number) {
@@ -121,18 +113,18 @@ export class HomePage implements OnInit, OnDestroy {
       }
     }
 
-    form.patchValue({cities});
-    this.citiesSaved.push({id: item.id, city: item.city, isChecked: item.isChecked});
+    form.patchValue({ cities });
+    this.citiesSaved.push({ id: item.id, city: item.city, isChecked: item.isChecked });
     this.citiesItems = [];
   }
 
   onClosingAutocomplete() {
-    if ( this.countriesItems.length > 0) {
+    if (this.countriesItems.length > 0) {
       this.countriesItems = [];
       return;
     }
 
-    if ( this.citiesItems.length > 0) {
+    if (this.citiesItems.length > 0) {
       this.citiesItems = [];
       return;
     }
@@ -140,7 +132,7 @@ export class HomePage implements OnInit, OnDestroy {
 
 
   findLastWriting(text: string): ICityModel {
-    const city: ICityModel = {id: null, city: '', isFirstCity: false};
+    const city: ICityModel = { id: null, city: '', isFirstCity: false };
 
     const position = text.lastIndexOf(',');
     if (position > -1) {
@@ -158,7 +150,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   findCity(city: string): ICityModel {
-    const returnValue: ICityModel = {id: null, city: '', isFirstCity: undefined};
+    const returnValue: ICityModel = { id: null, city: '', isFirstCity: undefined };
 
     const citiesFound = this.citiesRef.filter(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
     if (citiesFound !== undefined && citiesFound !== null && citiesFound.length === 1) {
@@ -178,20 +170,10 @@ export class HomePage implements OnInit, OnDestroy {
     return id;
   }
 
-  nextItem(item: string): boolean {
-    let isItem = false;
-    const lastChat: string = item.slice(item.length - 1);
-    if (lastChat.includes(',')) {
-      isItem = true;
-    }
-
-    return isItem;
-  }
-
-  setIsChecked(form: FormGroup): CityModel[] {
+  setIsChecked(cities: string) {
     let city = '';
-    const cities = form.value.cities;
     const position = cities.lastIndexOf(',');
+
     if (position > -1) {
       const buffer: string = cities.slice(0, position);
       const positionBefore = buffer.lastIndexOf(',');
@@ -205,14 +187,15 @@ export class HomePage implements OnInit, OnDestroy {
       } else {
         city = buffer;
       }
+    } else {
+      city = cities;
     }
 
-    const citiesFound = this.citiesRef.filter(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
-    if (citiesFound.length === 1 && citiesFound[0].city.includes(city)) {
-      citiesFound[0].isChecked = true;
+    const citiesFound = this.citiesRef.find(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
+    if (citiesFound !== undefined) {
+      citiesFound.isChecked = true;
     }
 
-    return citiesFound;
   }
 
   onSave() {
