@@ -108,6 +108,11 @@ export class CoreStorageService {
       city: 'Lille',
       isChecked: false
     },
+    {
+      id: 11,
+      city: 'Nicey',
+      isChecked: false
+    },
   ];
 
   constructor() { }
