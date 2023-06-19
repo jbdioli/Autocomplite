@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { from, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { CityModel } from 'src/app/models/city.model';
 import { CountryModel } from 'src/app/models/country.model';
 import { CoreStorageService } from 'src/app/services/core-storage.service';
@@ -178,79 +178,32 @@ export class HomePage implements OnInit, OnDestroy {
     let citiesList: string[];
 
     if (isFirstCity) {
-      citiesList  = cities.split(',');
+      citiesList = cities.toLocaleLowerCase().split(',');
     } else {
-      citiesList = cities.split(', ');
+      citiesList = cities.toLocaleLowerCase().split(', ');
     }
 
-    this.citiesRef.forEach((elmnt) => {
-      if (elmnt.isChecked) {
-        if (!citiesList.includes(elmnt.city)) {
-          elmnt.isChecked = false;
-        }
-      } else {
-        if (citiesList.includes(elmnt.city)) {
-          elmnt.isChecked = true;
-        }
+    // check comma
+    citiesList.forEach(city => {
+      const citiesFound = this.citiesRef.find(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
+      if (citiesFound === undefined) {
+        console.log('city not found', city);
       }
-
     });
 
-  }
-
-  // setIsChecked(cities: string) {
-  //   let city = '';
-  //   const position = cities.lastIndexOf(',');
-
-  //   if (position > -1) {
-  //     const buffer: string = cities.slice(0, position);
-  //     const positionBefore = buffer.lastIndexOf(',');
-  //     if (positionBefore > -1) {
-  //       const c: string = buffer.slice(positionBefore + 1, positionBefore + 2);
-  //       if (c.includes(' ')) {
-  //         city = buffer.slice(positionBefore + 2, position);
-  //       } else {
-  //         city = buffer.slice(positionBefore + 1, position);
-  //       }
-  //     } else {
-  //       city = buffer;
-  //     }
-  //   } else {
-  //     city = cities;
-  //   }
-
-  //   const citiesFound = this.citiesRef.find(elmnt => elmnt.city.toLocaleLowerCase().match('^' + city.toLocaleLowerCase() + '$'));
-  //   if (citiesFound !== undefined) {
-  //     citiesFound.isChecked = true;
-  //   }
-
-  // }
-
-  unSetIsChecked(cities: string, isFirstCity: boolean) {
-
-    let citiesList: string[];
-
-    if (isFirstCity) {
-      citiesList  = cities.split(',');
-    } else {
-      citiesList = cities.split(', ');
-    }
-
-    // console.log('list ', citiesList);
-
     this.citiesRef.forEach((elmnt) => {
-      let isCityFound = false;
-      if (elmnt.isChecked) {
-        console.log('element ', elmnt.city);
-        console.log('list ', citiesList);
-        isCityFound = citiesList.includes(elmnt.city);
-        console.log('isCityFound ', isCityFound);
-      }
-      if (!isCityFound && elmnt.isChecked) {
+
+      const isCity = citiesList.includes(elmnt.city.toLocaleLowerCase());
+      if (!isCity) {
         elmnt.isChecked = false;
+      } else {
+        elmnt.isChecked = true;
       }
+
     });
+
   }
+
 
   onSave() {
     console.log('Form : ', this.form.value);
